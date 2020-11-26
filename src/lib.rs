@@ -1,6 +1,13 @@
 #![feature(min_const_generics)]
 
+trait Ring {
+    fn add(self, other : Self) -> Self where Self : Sized;
+    fn sub(self, other : Self) -> Self where Self : Sized;
+    fn mul(self, other : Self) -> Self where Self : Sized;
+}
+
 mod modular_arithmetic {
+    use super::Ring;
     use std::ops::{Add, Mul, Neg, Sub};
 
     #[derive(Debug, Copy, Clone, Default, Eq)]
@@ -9,6 +16,18 @@ mod modular_arithmetic {
     impl<const Q: u32> Modular<Q> {
         fn new(x: u32) -> Self {
             Modular(x % Q)
+        }
+    }
+
+    impl<const Q: u32> Ring for Modular<Q> {
+        fn add(self, other : Self) -> Self {
+            self + other
+        }
+        fn sub(self, other : Self) -> Self {
+            self - other
+        }
+        fn mul(self, other : Self) -> Self {
+            self * other
         }
     }
 

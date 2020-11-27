@@ -6,8 +6,11 @@ trait Ring: Add + Sub + Mul + Sized {}
 
 impl<R: Add + Sub + Mul + Sized> Ring for R {}
 
+/// An element of Mat_{N x M}(R)
+struct Matrix<R : Ring, const N : usize, const M : usize>([[R;M];N]);
+
 mod modular_arithmetic {
-    use std::ops::{Add, Mul, Neg, Sub};
+    use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
     #[derive(Debug, Copy, Clone, Default, Eq)]
     struct Modular<const Q: u32>(u32);
@@ -24,7 +27,7 @@ mod modular_arithmetic {
     impl<const Q: u32> Add<Modular<Q>> for Modular<Q> {
         type Output = Modular<Q>;
 
-        fn add(self, other: Self) -> Self
+        fn add(self, other: Self) -> Self::Output
         where
             Self: Sized,
         {
@@ -32,38 +35,53 @@ mod modular_arithmetic {
         }
     }
 
+    impl<const Q: u32> AddAssign<Modular<Q>> for Modular<Q> {
+        fn add_assign(&mut self, other: Self) {
+            *self = self.add(other)
+        }
+    }
+
     impl<const Q: u32> Mul<Modular<Q>> for Modular<Q> {
         type Output = Modular<Q>;
 
-        fn mul(self, other: Self) -> Self
+        fn mul(self, other: Self) -> Self::Output
         where
             Self: Sized,
         {
             // Multiplication can easily overflow datatype
             // Convert things up to u64's for multiplication, then back down after
-            // Can change later to do strictly u32 multiplication by using Karabatsu
-            let x : u64 = self.0.into();
-            let y : u64 = other.0.into();
-            let modulus : u64 = Q.into();
-            Modular::new((x * y % modulus) as u32) 
+            let x: u64 = self.0.into();
+            let y: u64 = other.0.into();
+            let modulus: u64 = Q.into();
+            Modular::new((x * y % modulus) as u32)
+        }
+    }
+    impl<const Q: u32> MulAssign<Modular<Q>> for Modular<Q> {
+        fn mul_assign(&mut self, other: Self) {
+            *self = self.mul(other)
         }
     }
 
     impl<const Q: u32> Sub<Modular<Q>> for Modular<Q> {
         type Output = Modular<Q>;
 
-        fn sub(self, other: Self) -> Self
+        fn sub(self, other: Self) -> Self::Output
         where
             Self: Sized,
         {
-            Modular::new(self.0 + Q - other.0)
+            Modular::new(self.0 + other.neg().0)
+        }
+    }
+    impl<const Q: u32> SubAssign<Modular<Q>> for Modular<Q> {
+        fn sub_assign(&mut self, other: Self) {
+            *self = self.sub(other)
         }
     }
 
     impl<const Q: u32> Neg for Modular<Q> {
         type Output = Modular<Q>;
 
-        fn neg(self) -> Self
+        fn neg(self) -> Self::Output
         where
             Self: Sized,
         {

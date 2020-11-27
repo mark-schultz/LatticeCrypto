@@ -8,7 +8,7 @@ use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 extern crate alga_derive;
 
 #[derive(Clone, Copy, PartialEq, Alga)]
-#[alga_traits(RingCommutative(Additive, Multiplicative))]
+#[alga_traits(Ring(Additive, Multiplicative))]
 struct Modular<const Q: u32>(u32);
 
 impl<const Q: u32> Modular<Q> {

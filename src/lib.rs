@@ -1,39 +1,23 @@
 #![feature(min_const_generics)]
 
-trait Ring {
-    fn add(self, other: Self) -> Self
-    where
-        Self: Sized;
-    fn sub(self, other: Self) -> Self
-    where
-        Self: Sized;
-    fn mul(self, other: Self) -> Self
-    where
-        Self: Sized;
-}
+use std::ops::{Add, Mul, Sub};
+
+trait Ring: Add + Sub + Mul + Sized {}
+
+impl<R: Add + Sub + Mul + Sized> Ring for R {}
 
 mod modular_arithmetic {
-    use super::Ring;
     use std::ops::{Add, Mul, Neg, Sub};
 
     #[derive(Debug, Copy, Clone, Default, Eq)]
     struct Modular<const Q: u32>(u32);
+    // Can't generalize to arbitrary unsigned currently
+    // as const generic parameter Q can't depend on other
+    // generic types (such as T where T : Unsigned).
 
     impl<const Q: u32> Modular<Q> {
         fn new(x: u32) -> Self {
             Modular(x % Q)
-        }
-    }
-
-    impl<const Q: u32> Ring for Modular<Q> {
-        fn add(self, other: Self) -> Self {
-            self + other
-        }
-        fn sub(self, other: Self) -> Self {
-            self - other
-        }
-        fn mul(self, other: Self) -> Self {
-            self * other
         }
     }
 
@@ -55,7 +39,13 @@ mod modular_arithmetic {
         where
             Self: Sized,
         {
-            Modular::new(self.0 * other.0)
+            // Multiplication can easily overflow datatype
+            // Convert things up to u64's for multiplication, then back down after
+            // Can change later to do strictly u32 multiplication by using Karabatsu
+            let x : u64 = self.0.into();
+            let y : u64 = other.0.into();
+            let modulus : u64 = Q.into();
+            Modular::new((x * y % modulus) as u32) 
         }
     }
 

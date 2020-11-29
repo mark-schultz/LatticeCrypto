@@ -2,24 +2,18 @@
 
 use alga::general::*;
 use num_traits::identities::{One, Zero};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::convert::From;
+use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[macro_use]
 extern crate alga_derive;
 
-
 #[derive(Clone, Copy, PartialEq, Alga)]
-#[alga_traits(GroupAbelian(Additive), Semigroup(Multiplicative))]
+#[alga_traits(RingCommutative(Additive, Multiplicative))]
 struct Modular<const Q: u32>(u32);
 
-impl<const Q: u32> AbstractRingCommutative for Modular<Q> {}
-impl<const Q: u32> AbstractRing for Modular<Q> {}
-impl<const Q: u32> AbstractMonoid<Multiplicative> for Modular<Q> {}
-
-
-impl<const Q: u32> From<[u32; 1]> for Modular<Q>  {
-    fn from(x : [u32; 1]) -> Self {
+impl<const Q: u32> From<[u32; 1]> for Modular<Q> {
+    fn from(x: [u32; 1]) -> Self {
         Modular(x[0] % Q)
     }
 }
@@ -59,7 +53,7 @@ impl<const Q: u32> Mul<Modular<Q>> for Modular<Q> {
     type Output = Modular<Q>;
     fn mul(self, other: Self) -> Self::Output {
         let x: u64 = self.0.into();
-        let y: u64 = self.0.into();
+        let y: u64 = other.0.into();
         let modulus: u64 = Q.into();
         Modular::from([(x * y % modulus) as u32])
     }

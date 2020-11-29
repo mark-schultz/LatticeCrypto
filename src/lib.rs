@@ -3,52 +3,49 @@
 use alga::general::*;
 use num_traits::identities::{One, Zero};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::convert::From;
 
-#[derive(Clone, Copy, PartialEq)]
+#[macro_use]
+extern crate alga_derive;
+
+
+#[derive(Clone, Copy, PartialEq, Alga)]
+#[alga_traits(GroupAbelian(Additive), Semigroup(Multiplicative))]
 struct Modular<const Q: u32>(u32);
 
-impl<const Q: u32> AbstractMonoid<Multiplicative> for Modular<Q> {}
-impl<const Q: u32> AbstractQuasigroup<Additive> for Modular<Q> {}
-impl<const Q: u32> AbstractLoop<Additive> for Modular<Q> {}
-impl<const Q: u32> AbstractSemigroup<Additive> for Modular<Q> {}
-impl<const Q: u32> AbstractSemigroup<Multiplicative> for Modular<Q> {}
-impl<const Q: u32> AbstractMonoid<Additive> for Modular<Q> {}
-impl<const Q: u32> AbstractGroupAbelian<Additive> for Modular<Q> {}
-impl<const Q: u32> AbstractGroup<Additive> for Modular<Q> {}
-impl<const Q: u32> AbstractRing for Modular<Q> {}
 impl<const Q: u32> AbstractRingCommutative for Modular<Q> {}
+impl<const Q: u32> AbstractRing for Modular<Q> {}
+impl<const Q: u32> AbstractMonoid<Multiplicative> for Modular<Q> {}
 
 
-impl<const Q: u32> Modular<Q> {
-    fn new(x: u32) -> Self {
-        Modular(x % Q)
+impl<const Q: u32> From<[u32; 1]> for Modular<Q>  {
+    fn from(x : [u32; 1]) -> Self {
+        Modular(x[0] % Q)
     }
 }
 
 impl<const Q: u32> Add<Modular<Q>> for Modular<Q> {
     type Output = Modular<Q>;
     fn add(self, other: Self) -> Self::Output {
-        Modular::new(self.0 + other.0)
+        Modular::from([self.0 + other.0])
     }
 }
-
 impl<const Q: u32> AddAssign<Modular<Q>> for Modular<Q> {
     fn add_assign(&mut self, other: Self) {
         *self = self.add(other)
     }
 }
-
 impl<const Q: u32> Neg for Modular<Q> {
     type Output = Modular<Q>;
     fn neg(self) -> Self::Output {
-        Modular::new(Q - self.0)
+        Modular::from([Q - self.0])
     }
 }
 
 impl<const Q: u32> Sub<Modular<Q>> for Modular<Q> {
     type Output = Modular<Q>;
     fn sub(self, other: Self) -> Self::Output {
-        Modular::new(self.0 + other.neg().0)
+        Modular::from([self.0 + other.neg().0])
     }
 }
 
@@ -64,16 +61,14 @@ impl<const Q: u32> Mul<Modular<Q>> for Modular<Q> {
         let x: u64 = self.0.into();
         let y: u64 = self.0.into();
         let modulus: u64 = Q.into();
-        Modular::new((x * y % modulus) as u32)
+        Modular::from([(x * y % modulus) as u32])
     }
 }
-
 impl<const Q: u32> MulAssign<Modular<Q>> for Modular<Q> {
     fn mul_assign(&mut self, other: Self) {
         *self = self.mul(other)
     }
 }
-
 impl<const Q: u32> Zero for Modular<Q> {
     fn zero() -> Self {
         Modular(0)

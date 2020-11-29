@@ -1,15 +1,23 @@
 #![feature(min_const_generics)]
 
-use alga::general::{AbstractMagma, Additive, Identity, Multiplicative, TwoSidedInverse};
+use alga::general::*;
 use num_traits::identities::{One, Zero};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
-#[macro_use]
-extern crate alga_derive;
-
-#[derive(Clone, Copy, PartialEq, Alga)]
-#[alga_traits(Ring(Additive, Multiplicative))]
+#[derive(Clone, Copy, PartialEq)]
 struct Modular<const Q: u32>(u32);
+
+impl<const Q: u32> AbstractMonoid<Multiplicative> for Modular<Q> {}
+impl<const Q: u32> AbstractQuasigroup<Additive> for Modular<Q> {}
+impl<const Q: u32> AbstractLoop<Additive> for Modular<Q> {}
+impl<const Q: u32> AbstractSemigroup<Additive> for Modular<Q> {}
+impl<const Q: u32> AbstractSemigroup<Multiplicative> for Modular<Q> {}
+impl<const Q: u32> AbstractMonoid<Additive> for Modular<Q> {}
+impl<const Q: u32> AbstractGroupAbelian<Additive> for Modular<Q> {}
+impl<const Q: u32> AbstractGroup<Additive> for Modular<Q> {}
+impl<const Q: u32> AbstractRing for Modular<Q> {}
+impl<const Q: u32> AbstractRingCommutative for Modular<Q> {}
+
 
 impl<const Q: u32> Modular<Q> {
     fn new(x: u32) -> Self {

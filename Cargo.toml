@@ -10,5 +10,5 @@ edition = "2018"
 
 num-traits = "0.2.14"
 alga = "0.9.3"
-alga_derive = { path = "../alga/alga_derive" }
+alga_derive = { git = "https://github.com/dimforge/alga/", branch = "dev" }
 quickcheck = "*"

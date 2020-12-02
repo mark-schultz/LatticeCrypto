@@ -52,7 +52,7 @@ pub mod modular {
             Modular(x[0] % Q)
         }
     }
-
+    // TODO: Rewrite to allow sub to follow the same pattern
     macro_rules! checked_opp {
         ($func:ident, $bound:ident, $checked_func:ident) => {
             impl<const Q: u32> $bound<Modular<Q>> for Modular<Q> {
@@ -115,7 +115,8 @@ pub mod modular {
             Modular(1)
         }
     }
-
+    // TODO: Write macros to generate the below
+    // from Add, AddAssign, Mul, MulAssign, Sub, One, and Zero
     impl<const Q: u32> Identity<Additive> for Modular<Q> {
         fn identity() -> Self {
             Self::zero()

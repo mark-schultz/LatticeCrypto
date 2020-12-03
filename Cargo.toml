@@ -8,3 +8,7 @@ edition = "2018"
 
 [dependencies]
 
+num-traits = "0.2.14"
+alga = "0.9.3"
+alga_derive = { git = "https://github.com/dimforge/alga/", branch = "dev" }
+quickcheck = "*"

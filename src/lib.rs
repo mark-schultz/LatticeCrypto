@@ -52,7 +52,6 @@ pub mod modular {
             Modular(x[0] % Q)
         }
     }
-    // TODO: Rewrite to allow sub to follow the same pattern
     macro_rules! checked_opp {
         ($func:ident, $bound:ident, $checked_func:ident) => {
             impl<const Q: u32> $bound<Modular<Q>> for Modular<Q> {
@@ -74,6 +73,7 @@ pub mod modular {
     }
     checked_opp!(add, Add, checked_add);
     checked_opp!(mul, Mul, checked_mul);
+
     impl<const Q: u32> Neg for Modular<Q> {
         type Output = Modular<Q>;
         fn neg(self) -> Self::Output {
@@ -84,7 +84,7 @@ pub mod modular {
     impl<const Q: u32> Sub<Modular<Q>> for Modular<Q> {
         type Output = Modular<Q>;
         fn sub(self, other: Self) -> Self::Output {
-            Modular::from([self.0 + other.neg().0])
+            self + other.neg()
         }
     }
 
